@@ -1,0 +1,73 @@
+classDiagram
+    class User {
+    +int Id
+    +string Username
+    +string Email
+    +string Password
+    +DateTime CreatedAt
+    +DateTime UpdatedAt
+    }
+    
+    class MediaEntry {
+    +int Id
+    +int CreatorId
+    +string Title
+    +string Description
+    +MediaType Type
+    +int ReleaseYear
+    +List~string~ Genres
+    +List~Rating~RatingsList
+    +double AverageRating
+    +DateTime CreatedAt
+    }
+    
+    class Rating {
+    +int Id
+    +int UserId
+    +int MediaId
+    +int Stars
+    +string Comment
+    +bool IsCommentConfirmed
+    +DateTime CreatedAt
+    }
+    
+    class UserFavorite {
+    +int UserId
+    +int MediaId
+    +DateTime CreatedAt
+    }
+    
+    class RatingLike {
+    +int UserId
+    +int RatingId
+    +DateTime CreatedAt
+    }
+    
+    class MediaType {
+    <<enumeration>>
+    Movie
+    Series
+    Game
+    }
+    
+    class AgeRestriction {
+    <<enumeration>>
+    AllAges
+    Teen
+    Mature
+    Adult
+    }
+
+User --> MediaEntry : creates
+User --> Rating : writes
+User --> UserFavorite : marks
+User --> RatingLike : likes
+
+MediaEntry --> Rating : receives
+MediaEntry --> UserFavorite : favorited_by
+MediaEntry --> MediaType : has_type
+MediaEntry --> AgeRestriction : has_restriction
+
+Rating --> RatingLike : receives_likes
+Rating --> User : written_by
+Rating --> MediaEntry : rates
