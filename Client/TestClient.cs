@@ -8,6 +8,7 @@ class TestClient
 {
     private static readonly HttpClient client = new HttpClient();
     private static string? authToken = null;
+    private static int? currentUserId = null;
 
     public static async Task Run()
     {
@@ -101,6 +102,12 @@ class TestClient
             if (jsonDoc.RootElement.TryGetProperty("Token", out var tokenElement))
             {
                 authToken = tokenElement.GetString();
+
+                if (jsonDoc.RootElement.TryGetProperty("UserId", out var userIdElement))
+                {
+                    currentUserId = userIdElement.GetInt32();
+                }
+
                 Console.WriteLine("Login erfolgreich!");
             }
         }
@@ -108,10 +115,13 @@ class TestClient
 
     static async Task GetProfile()
     {
-        Console.Write("Username: ");
-        var username = Console.ReadLine();
+        if (!currentUserId.HasValue)
+        {
+            Console.WriteLine("Bitte zuerst einloggen!");
+            return;
+        }
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/users/{username}/profile");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"/api/users/{currentUserId}/profile");
 
         if (!string.IsNullOrEmpty(authToken))
         {

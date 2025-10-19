@@ -68,8 +68,14 @@ public class UserController
                 HttpHelper.SendJsonResponse(context.Response, 401, "Invalid credentials");
                 return;
             }
-
-            var response = new LoginResponse { Token = token };
+            
+            var user = _userService.GetUserProfile(request.Username);
+            var response = new LoginResponse
+            {
+                Token = token,
+                UserId = user?.Id ?? 0,
+                Username = user?.Username ?? ""
+            };
             HttpHelper.SendJsonResponse(context.Response, 200, response);
         }
         catch (Exception ex)
@@ -83,13 +89,13 @@ public class UserController
     {
         try
         {
-            // Extrahiert username vom path
+            // Extrahiert id vom path
             var path = context.Request.Url?.AbsolutePath ?? "";
-            var parameters = HttpHelper.ExtractPathParameters("/api/users/{username}/profile", path);
+            var parameters = HttpHelper.ExtractPathParameters("/api/users/{id}/profile", path);
 
-            if (!parameters.TryGetValue("username", out var username))
+            if (!parameters.TryGetValue("id", out var idString) || !int.TryParse(idString, out var userId))
             {
-                HttpHelper.SendJsonResponse(context.Response, 400, "Username parameter missing");
+                HttpHelper.SendJsonResponse(context.Response, 400, "Invalid user ID");
                 return;
             }
 
@@ -107,8 +113,8 @@ public class UserController
                 return;
             }
 
-            // Get profile
-            var user = _userService.GetUserProfile(username);
+            // Get profile by ID
+            var user = _userService.GetUserProfileById(userId);
 
             if (user == null)
             {
@@ -150,6 +156,8 @@ public class LoginRequest
 public class LoginResponse
 {
     public string Token { get; set; } = "";
+    public int UserId { get; set; }
+    public string Username { get; set; } = "";
 }
 
 public class UserResponse

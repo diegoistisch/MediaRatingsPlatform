@@ -132,6 +132,11 @@ public class UserService : IUserService
         return userRepository.GetByUsername(username);
     }
 
+    public User? GetUserProfileById(int userId)
+    {
+        return userRepository.GetById(userId);
+    }
+
     public bool ValidateToken(string token)
     {
         var payload = ValidateAndDecodeToken(token);

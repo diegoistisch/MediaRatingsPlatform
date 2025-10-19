@@ -28,7 +28,7 @@ public class HttpServer
         // User endpoints
         _router.AddRoute("POST", "/api/users/register", _userController.Register);
         _router.AddRoute("POST", "/api/users/login", _userController.Login);
-        _router.AddRoute("GET", "/api/users/{username}/profile", _userController.GetProfile);
+        _router.AddRoute("GET", "/api/users/{id}/profile", _userController.GetProfile);
     }
 
     public void Start()
