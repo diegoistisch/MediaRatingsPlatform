@@ -6,43 +6,22 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Services erstellen
-        IUserRepository userRepository = new UserRepository();
-        IUserService userService = new UserService(userRepository);
+        // Create HTTP Server
+        var server = new HttpServer("http://localhost:8080/");
 
-        // Test User Registration
-        var user1 = userService.Register("testuser", "test@example.com", "password123");
-        if (user1 != null)
-        {
-            Console.WriteLine($"User registered: {user1.Username} (ID: {user1.Id})");
-        }
+        Console.WriteLine("Starting Media Ratings Platform Server...");
+        server.Start();
+
+        Console.WriteLine("Server is running. Press Ctrl+C to stop...");
         
-        // Test Login
-        var token2 = userService.Login("testuser", "password124");
-        if (token2 != null)
+        var exitEvent = new ManualResetEvent(false);
+        Console.CancelKeyPress += (sender, eventArgs) =>
         {
-            Console.WriteLine($"Login successful! Token: {token2}");
-        }
-        else
-        {
-            Console.WriteLine($"Login failed!");
-        }
+            eventArgs.Cancel = true;
+            exitEvent.Set();
+        };
 
-        // Test Login
-        var token = userService.Login("testuser", "password123");
-        if (token != null)
-        {
-            Console.WriteLine($"Login successful! Token: {token}");
-        }
-
-        // Test Profile
-        var profile = userService.GetUserProfile("testuser");
-        if (profile != null)
-        {
-            Console.WriteLine($"Profile: {profile.Username}, Email: {profile.Email}");
-        }
-
-        Console.WriteLine("\nPress any key to exit...");
-        Console.ReadKey();
+        exitEvent.WaitOne();
+        server.Stop();
     }
 }
