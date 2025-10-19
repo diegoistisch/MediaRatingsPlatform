@@ -1,3 +1,4 @@
+using MediaRatingsPlatform.Models;
 namespace MediaRatingsPlatform;
 
 public interface IRatingService

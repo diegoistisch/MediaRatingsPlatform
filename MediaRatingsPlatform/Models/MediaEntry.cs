@@ -1,4 +1,4 @@
-namespace MediaRatingsPlatform;
+namespace MediaRatingsPlatform.Models;
 
 public class MediaEntry
 {

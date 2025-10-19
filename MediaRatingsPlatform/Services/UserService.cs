@@ -1,4 +1,7 @@
-namespace MediaRatingsPlatform;
+using MediaRatingsPlatform.Interfaces;
+using MediaRatingsPlatform.Models;
+
+namespace MediaRatingsPlatform.Services;
 
 public class UserService : IUserService
 {
@@ -44,6 +47,30 @@ public class UserService : IUserService
 
     public User? GetUserProfile(string username)
     {
+        return userRepository.GetByUsername(username);
+    }
+
+    public bool ValidateToken(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return false;
+
+        // Token format: "username-mrpToken"
+        if (!token.EndsWith("-mrpToken"))
+            return false;
+
+        var username = token.Replace("-mrpToken", "");
+        var user = userRepository.GetByUsername(username);
+
+        return user != null;
+    }
+
+    public User? GetUserByToken(string token)
+    {
+        if (string.IsNullOrEmpty(token) || !token.EndsWith("-mrpToken"))
+            return null;
+
+        var username = token.Replace("-mrpToken", "");
         return userRepository.GetByUsername(username);
     }
 }

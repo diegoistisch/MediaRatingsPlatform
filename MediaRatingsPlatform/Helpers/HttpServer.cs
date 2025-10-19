@@ -1,19 +1,34 @@
 using System.Net;
-using System.Text;
+using MediaRatingsPlatform.Controllers;
+using MediaRatingsPlatform.Interfaces;
 
-namespace MediaRatingsPlatform;
+namespace MediaRatingsPlatform.Helpers;
 
 public class HttpServer
 {
     private readonly HttpListener _listener;
     private readonly string _url;
     private bool _isRunning;
+    private readonly Router _router;
+    private readonly UserController _userController;
 
-    public HttpServer(string url = "http://localhost:8080/")
+    public HttpServer(string url, IUserService userService)
     {
         _url = url;
         _listener = new HttpListener();
         _listener.Prefixes.Add(_url);
+        _router = new Router();
+        _userController = new UserController(userService);
+
+        ConfigureRoutes();
+    }
+
+    private void ConfigureRoutes()
+    {
+        // User endpoints
+        _router.AddRoute("POST", "/api/users/register", _userController.Register);
+        _router.AddRoute("POST", "/api/users/login", _userController.Login);
+        _router.AddRoute("GET", "/api/users/{username}/profile", _userController.GetProfile);
     }
 
     public void Start()
@@ -51,7 +66,7 @@ public class HttpServer
         }
     }
 
-    private void HandleRequest(HttpListenerContext context)
+    private async Task HandleRequest(HttpListenerContext context)
     {
         var request = context.Request;
         var response = context.Response;
@@ -59,35 +74,29 @@ public class HttpServer
         try
         {
             Console.WriteLine($"{request.HttpMethod} {request.Url?.AbsolutePath}");
-            
+
             var path = request.Url?.AbsolutePath ?? "/";
             var method = request.HttpMethod;
 
-            // Route handling
+            // Root endpoint
             if (path == "/" && method == "GET")
             {
-                SendResponse(response, 200, "Media Ratings Platform API is running");
+                HttpHelper.SendJsonResponse(response, 200, "Media Ratings Platform API is running");
+                return;
             }
-            else
+
+            // versucht den request an die richtige handler funktion weiterzuleiten
+            var routed = await _router.RouteRequest(context);
+
+            if (!routed)
             {
-                SendResponse(response, 404, "Endpoint not found");
+                HttpHelper.SendJsonResponse(response, 404, "Endpoint not found");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Request handling error: {ex.Message}");
-            SendResponse(response, 500, "Internal server error");
+            HttpHelper.SendJsonResponse(response, 500, "Internal server error");
         }
-    }
-
-    private void SendResponse(HttpListenerResponse response, int statusCode, string content)
-    {
-        response.StatusCode = statusCode;
-        response.ContentType = "application/json";
-
-        var buffer = Encoding.UTF8.GetBytes(content);
-        response.ContentLength64 = buffer.Length;
-        response.OutputStream.Write(buffer, 0, buffer.Length);
-        response.OutputStream.Close();
     }
 }

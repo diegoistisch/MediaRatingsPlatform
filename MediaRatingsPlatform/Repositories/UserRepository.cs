@@ -1,4 +1,7 @@
-namespace MediaRatingsPlatform;
+using MediaRatingsPlatform.Interfaces;
+using MediaRatingsPlatform.Models;
+
+namespace MediaRatingsPlatform.Repositories;
 
 public class UserRepository : IUserRepository
 {
