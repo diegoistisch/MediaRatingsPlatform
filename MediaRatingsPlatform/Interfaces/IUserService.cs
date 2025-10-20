@@ -4,10 +4,17 @@ namespace MediaRatingsPlatform.Interfaces;
 
 public interface IUserService
 {
-    User? Register(string username, string email, string password);
-    string? Login(string username, string password);
-    User? GetUserProfile(string username);
-    User? GetUserProfileById(int userId);
+    User? RegisterUser(string username, string email, string password);
+    AuthenticationResult? AuthenticateUser(string username, string password);
+    User? GetUserById(int userId);
+    User? GetUserByUsername(string username);
     bool ValidateToken(string token);
     User? GetUserByToken(string token);
+}
+
+public class AuthenticationResult
+{
+    public string Token { get; set; } = "";
+    public int UserId { get; set; }
+    public string Username { get; set; } = "";
 }

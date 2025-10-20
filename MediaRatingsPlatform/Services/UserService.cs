@@ -93,7 +93,7 @@ public class UserService : IUserService
         public long exp { get; set; }
     }
 
-    public User? Register(string username, string email, string password)
+    public User? RegisterUser(string username, string email, string password)
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             return null;
@@ -113,7 +113,7 @@ public class UserService : IUserService
         return user;
     }
 
-    public string? Login(string username, string password)
+    public AuthenticationResult? AuthenticateUser(string username, string password)
     {
         User? user = userRepository.GetByUsername(username);
         if (user == null)
@@ -122,19 +122,24 @@ public class UserService : IUserService
         if (user.Password != password)
             return null;
 
-        // Generiere richtigen Token mit Signatur und Ablaufzeit von 24 Stunden
         string token = GenerateToken(username, user.Id);
-        return token;
+
+        return new AuthenticationResult
+        {
+            Token = token,
+            UserId = user.Id,
+            Username = user.Username
+        };
     }
 
-    public User? GetUserProfile(string username)
-    {
-        return userRepository.GetByUsername(username);
-    }
-
-    public User? GetUserProfileById(int userId)
+    public User? GetUserById(int userId)
     {
         return userRepository.GetById(userId);
+    }
+
+    public User? GetUserByUsername(string username)
+    {
+        return userRepository.GetByUsername(username);
     }
 
     public bool ValidateToken(string token)
@@ -149,6 +154,6 @@ public class UserService : IUserService
         if (payload == null)
             return null;
 
-        return userRepository.GetByUsername(payload.username);
+        return GetUserByUsername(payload.username);
     }
 }

@@ -2,18 +2,25 @@ using System.Net;
 using MediaRatingsPlatform.Helpers;
 using MediaRatingsPlatform.Interfaces;
 
-namespace MediaRatingsPlatform.Controllers;
+namespace MediaRatingsPlatform.Endpoints;
 
-public class UserController
+public class UserEndpoints : IHttpEndpoint
 {
     private readonly IUserService _userService;
 
-    public UserController(IUserService userService)
+    public UserEndpoints(IUserService userService)
     {
         _userService = userService;
     }
 
-    public async Task Register(HttpListenerContext context)
+    public void RegisterRoutes(Router router)
+    {
+        router.AddRoute("POST", "/api/users/register", Register);
+        router.AddRoute("POST", "/api/users/login", Login);
+        router.AddRoute("GET", "/api/users/{id}/profile", GetProfile);
+    }
+
+    private async Task Register(HttpListenerContext context)
     {
         try
         {
@@ -25,7 +32,7 @@ public class UserController
                 return;
             }
 
-            var user = _userService.Register(request.Username, request.Email ?? "", request.Password);
+            var user = _userService.RegisterUser(request.Username, request.Email ?? "", request.Password);
 
             if (user == null)
             {
@@ -49,7 +56,7 @@ public class UserController
         }
     }
 
-    public async Task Login(HttpListenerContext context)
+    private async Task Login(HttpListenerContext context)
     {
         try
         {
@@ -61,21 +68,21 @@ public class UserController
                 return;
             }
 
-            var token = _userService.Login(request.Username, request.Password);
+            var loginResult = _userService.AuthenticateUser(request.Username, request.Password);
 
-            if (token == null)
+            if (loginResult == null)
             {
                 HttpHelper.SendJsonResponse(context.Response, 401, "Invalid credentials");
                 return;
             }
-            
-            var user = _userService.GetUserProfile(request.Username);
+
             var response = new LoginResponse
             {
-                Token = token,
-                UserId = user?.Id ?? 0,
-                Username = user?.Username ?? ""
+                Token = loginResult.Token,
+                UserId = loginResult.UserId,
+                Username = loginResult.Username
             };
+
             HttpHelper.SendJsonResponse(context.Response, 200, response);
         }
         catch (Exception ex)
@@ -85,11 +92,10 @@ public class UserController
         }
     }
 
-    public async Task GetProfile(HttpListenerContext context)
+    private async Task GetProfile(HttpListenerContext context)
     {
         try
         {
-            // Extrahiert id vom path
             var path = context.Request.Url?.AbsolutePath ?? "";
             var parameters = HttpHelper.ExtractPathParameters("/api/users/{id}/profile", path);
 
@@ -99,7 +105,6 @@ public class UserController
                 return;
             }
 
-            // Check authentifizierung
             var token = HttpHelper.GetAuthToken(context.Request);
             if (string.IsNullOrEmpty(token))
             {
@@ -113,8 +118,7 @@ public class UserController
                 return;
             }
 
-            // Get profile by ID
-            var user = _userService.GetUserProfileById(userId);
+            var user = _userService.GetUserById(userId);
 
             if (user == null)
             {

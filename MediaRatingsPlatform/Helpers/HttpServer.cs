@@ -1,5 +1,5 @@
 using System.Net;
-using MediaRatingsPlatform.Controllers;
+using MediaRatingsPlatform.Endpoints;
 using MediaRatingsPlatform.Interfaces;
 
 namespace MediaRatingsPlatform.Helpers;
@@ -10,7 +10,6 @@ public class HttpServer
     private readonly string _url;
     private bool _isRunning;
     private readonly Router _router;
-    private readonly UserController _userController;
 
     public HttpServer(string url, IUserService userService)
     {
@@ -18,17 +17,16 @@ public class HttpServer
         _listener = new HttpListener();
         _listener.Prefixes.Add(_url);
         _router = new Router();
-        _userController = new UserController(userService);
 
-        ConfigureRoutes();
-    }
+        var endpoints = new List<IHttpEndpoint>
+        {
+            new UserEndpoints(userService)
+        };
 
-    private void ConfigureRoutes()
-    {
-        // User endpoints
-        _router.AddRoute("POST", "/api/users/register", _userController.Register);
-        _router.AddRoute("POST", "/api/users/login", _userController.Login);
-        _router.AddRoute("GET", "/api/users/{id}/profile", _userController.GetProfile);
+        foreach (var endpoint in endpoints)
+        {
+            endpoint.RegisterRoutes(_router);
+        }
     }
 
     public void Start()
