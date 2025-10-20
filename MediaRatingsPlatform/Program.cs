@@ -9,12 +9,16 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Initialize services
+        // Initialize repositories
         IUserRepository userRepository = new UserRepository();
+        IMediaRepository mediaRepository = new MediaRepository();
+
+        // Initialize services
         IUserService userService = new UserService(userRepository);
+        IMediaService mediaService = new MediaService(mediaRepository);
 
         // Create HTTP Server with dependencies
-        var server = new HttpServer("http://localhost:8080/", userService);
+        var server = new HttpServer("http://localhost:8080/", userService, mediaService);
 
         Console.WriteLine("Starting Media Ratings Platform Server...");
         server.Start();

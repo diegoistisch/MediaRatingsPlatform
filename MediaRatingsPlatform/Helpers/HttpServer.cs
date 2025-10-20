@@ -11,7 +11,7 @@ public class HttpServer
     private bool _isRunning;
     private readonly Router _router;
 
-    public HttpServer(string url, IUserService userService)
+    public HttpServer(string url, IUserService userService, IMediaService mediaService)
     {
         _url = url;
         _listener = new HttpListener();
@@ -20,7 +20,8 @@ public class HttpServer
 
         var endpoints = new List<IHttpEndpoint>
         {
-            new UserEndpoints(userService)
+            new UserEndpoints(userService),
+            new MediaEndpoints(mediaService, userService)
         };
 
         foreach (var endpoint in endpoints)
