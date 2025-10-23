@@ -1,5 +1,5 @@
 using MediaRatingsPlatform.Models;
-namespace MediaRatingsPlatform;
+namespace MediaRatingsPlatform.Interfaces;
 
 public interface IRatingRepository
 {

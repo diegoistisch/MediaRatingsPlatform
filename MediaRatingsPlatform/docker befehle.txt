@@ -1,0 +1,11 @@
+## Starten
+    docker-compose up -d
+
+# Stoppen
+    docker-compose down
+
+## Logs anschauen
+    docker-compose logs -f
+
+## Alles löschen (inkl. Daten!)
+    docker-compose down -v
