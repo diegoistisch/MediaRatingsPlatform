@@ -7,10 +7,12 @@ namespace MediaRatingsPlatform.Endpoints;
 public class UserEndpoints : IHttpEndpoint
 {
     private readonly IUserService _userService;
+    private readonly IStatisticsService _statisticsService;
 
-    public UserEndpoints(IUserService userService)
+    public UserEndpoints(IUserService userService, IStatisticsService statisticsService)
     {
         _userService = userService;
+        _statisticsService = statisticsService;
     }
 
     public void RegisterRoutes(Router router)
@@ -126,11 +128,14 @@ public class UserEndpoints : IHttpEndpoint
                 return;
             }
 
-            var response = new UserResponse
+            var stats = _statisticsService.GetUserStatistics(userId);
+
+            var response = new UserProfileResponse
             {
                 Id = user.Id,
                 Username = user.Username,
-                Email = user.Email
+                Email = user.Email,
+                Statistics = stats
             };
 
             HttpHelper.SendJsonResponse(context.Response, 200, response);
@@ -141,6 +146,14 @@ public class UserEndpoints : IHttpEndpoint
             HttpHelper.SendJsonResponse(context.Response, 500, "Internal server error");
         }
     }
+}
+
+public class UserProfileResponse
+{
+    public int Id { get; set; }
+    public string Username { get; set; } = "";
+    public string Email { get; set; } = "";
+    public MediaRatingsPlatform.Interfaces.UserStatistics Statistics { get; set; }
 }
 
 // DTOs
