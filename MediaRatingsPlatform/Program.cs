@@ -28,13 +28,22 @@ class Program
         // Initialize repositories with connection string
         IUserRepository userRepository = new UserRepository(CONNECTION_STRING);
         IMediaRepository mediaRepository = new MediaRepository(CONNECTION_STRING);
+        IRatingRepository ratingRepository = new RatingRepository(CONNECTION_STRING);
+        IFavoriteRepository favoriteRepository = new FavoriteRepository(CONNECTION_STRING);
+        ILikeRepository likeRepository = new LikeRepository(CONNECTION_STRING);
 
         // Initialize services
         IUserService userService = new UserService(userRepository);
         IMediaService mediaService = new MediaService(mediaRepository);
+        IRatingService ratingService = new RatingService(ratingRepository, mediaRepository);
+        IFavoriteService favoriteService = new FavoriteService(favoriteRepository, mediaRepository);
+        ILikeService likeService = new LikeService(likeRepository, ratingRepository);
+        ILeaderboardService leaderboardService = new LeaderboardService(ratingRepository, userRepository);
+        IRecommendationService recommendationService = new RecommendationService(ratingRepository, mediaRepository);
+        IStatisticsService statisticsService = new StatisticsService(ratingRepository, favoriteRepository, mediaRepository);
 
         // Create HTTP Server with dependencies
-        var server = new HttpServer("http://localhost:8080/", userService, mediaService);
+        var server = new HttpServer("http://localhost:8080/", userService, mediaService, ratingService, favoriteService, likeService, leaderboardService, recommendationService, statisticsService);
 
         Console.WriteLine("Starting Media Ratings Platform Server...");
         server.Start();

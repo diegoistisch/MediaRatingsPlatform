@@ -11,7 +11,15 @@ public class HttpServer
     private bool _isRunning;
     private readonly Router _router;
 
-    public HttpServer(string url, IUserService userService, IMediaService mediaService)
+    public HttpServer(string url, 
+        IUserService userService, 
+        IMediaService mediaService,
+        IRatingService ratingService,
+        IFavoriteService favoriteService,
+        ILikeService likeService,
+        ILeaderboardService leaderboardService,
+        IRecommendationService recommendationService,
+        IStatisticsService statisticsService)
     {
         _url = url;
         _listener = new HttpListener();
@@ -20,8 +28,13 @@ public class HttpServer
 
         var endpoints = new List<IHttpEndpoint>
         {
-            new UserEndpoints(userService),
-            new MediaEndpoints(mediaService, userService)
+            new UserEndpoints(userService, statisticsService),
+            new MediaEndpoints(mediaService, userService),
+            new RatingEndpoints(ratingService, userService),
+            new FavoriteEndpoints(favoriteService, userService),
+            new LikeEndpoints(likeService, userService),
+            new LeaderboardEndpoints(leaderboardService),
+            new RecommendationEndpoints(recommendationService, userService)
         };
 
         foreach (var endpoint in endpoints)
