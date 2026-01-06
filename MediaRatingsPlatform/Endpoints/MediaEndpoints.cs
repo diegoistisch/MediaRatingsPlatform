@@ -86,7 +86,59 @@ public class MediaEndpoints : IHttpEndpoint
             var user = AuthorizationHelper.AuthorizeRequest(context, _userService);
             if (user == null) return;
 
-            var media = _mediaService.GetAllMedia();
+            var query = context.Request.QueryString;
+            var search = query["search"];
+            var genre = query["genre"];
+            var typeString = query["type"];
+            var yearString = query["year"];
+            var ageString = query["ageRestriction"];
+            var minRatingString = query["minRating"];
+            var sortBy = query["sortBy"];
+
+            IEnumerable<MediaEntry> media;
+
+            // 1. Initial Fetch
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                media = _mediaService.SearchMedia(search);
+            }
+            else
+            {
+                media = _mediaService.GetAllMedia();
+            }
+
+            // 2. Apply Filters
+            if (!string.IsNullOrWhiteSpace(genre))
+            {
+                media = media.Where(m => m.Genres.Any(g => g.Contains(genre, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(typeString) && int.TryParse(typeString, out var typeInt))
+            {
+                 media = media.Where(m => (int)m.Type == typeInt);
+            }
+
+            if (!string.IsNullOrWhiteSpace(yearString) && int.TryParse(yearString, out var year))
+            {
+                 media = media.Where(m => m.ReleaseYear == year);
+            }
+
+            if (!string.IsNullOrWhiteSpace(ageString) && int.TryParse(ageString, out var age))
+            {
+                 media = media.Where(m => (int)m.AgeRestriction == age);
+            }
+
+            if (!string.IsNullOrWhiteSpace(minRatingString) && double.TryParse(minRatingString, out var minRating))
+            {
+                 media = media.Where(m => m.AverageRating >= minRating);
+            }
+
+            // 3. Apply Sorting
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                media = _mediaService.SortMedia(media, sortBy);
+            }
+
             var response = media.Select(m => new MediaResponse
             {
                 Id = m.Id,
