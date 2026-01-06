@@ -1,8 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaRatingsPlatform", "MediaRatingsPlatform\MediaRatingsPlatform.csproj", "{811C1ADC-8770-4483-8B1E-16A7C08E2EC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{FF439BC9-14D5-4103-A9F3-25376C625246}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediaRatingsPlatform.Tests", "MediaRatingsPlatform.Tests\MediaRatingsPlatform.Tests.csproj", "{C938B5B6-233D-4FEF-A42B-BD1DF9CC68C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +21,9 @@ Global
 		{FF439BC9-14D5-4103-A9F3-25376C625246}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF439BC9-14D5-4103-A9F3-25376C625246}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF439BC9-14D5-4103-A9F3-25376C625246}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C938B5B6-233D-4FEF-A42B-BD1DF9CC68C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C938B5B6-233D-4FEF-A42B-BD1DF9CC68C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C938B5B6-233D-4FEF-A42B-BD1DF9CC68C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C938B5B6-233D-4FEF-A42B-BD1DF9CC68C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
