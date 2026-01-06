@@ -12,4 +12,6 @@ public interface IRatingRepository
     bool Delete(int id);
     bool Exists(int id);
     bool UserHasRated(int userId, int mediaId);
+    double CalculateAverageRating(int mediaId);
+    Dictionary<int, int> GetTopActiveUsers(int limit);
 }
