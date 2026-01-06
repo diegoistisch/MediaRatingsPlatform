@@ -102,11 +102,14 @@ public class UserService : IUserService
         if (existingUser != null)
             return null;
 
+        // Hash password with BCrypt
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
         User user = new User
         {
             Username = username,
             Email = email,
-            Password = password
+            Password = hashedPassword
         };
 
         userRepository.Add(user);
@@ -119,7 +122,8 @@ public class UserService : IUserService
         if (user == null)
             return null;
 
-        if (user.Password != password)
+        // Verify password with BCrypt
+        if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
             return null;
 
         string token = GenerateToken(username, user.Id);
